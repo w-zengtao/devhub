@@ -8,7 +8,7 @@ class Subscription < ApplicationRecord
 
   scope :un_terminated, -> { where(terminated: false)}
   scope :without_order, -> (period) {
-    where.not(id: Subscription.joins(:orders).where("orders.period_id = ?", period.id)) if period
+    un_terminated.where.not(id: Subscription.joins(:orders).where("orders.period_id = ?", period.id)) if period
   }
 
   # ------------------- Callbacks -------------------
