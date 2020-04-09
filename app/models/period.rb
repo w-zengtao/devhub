@@ -10,7 +10,7 @@ class Period < ApplicationRecord
 
   include AsyncHelper
 
-  async_helper(:cutoff)
+  # async_helper(:cutoff)
 
   # ------------------- Class Methods -------------------
   class << self
@@ -20,12 +20,15 @@ class Period < ApplicationRecord
     end
 
     def current
-      Period.active.last
+      period = Period.where("cut_at >= ?", Time.now).last
+      Period.last unless period
     end
 
-    def check_off(period)
-
+    def build_new(opts)
+      period = Period.create(opts)
+      CutoffWorker.perform_at(period, period.cut_at)
     end
+
   end
 
   # ------------------- Class Methods End -------------------
@@ -34,18 +37,43 @@ class Period < ApplicationRecord
   # 1. 检查所有 未终止 的订阅 并且 未创建订单的订阅
   # 2. 终止自己、并且创建下一个 Period 实例
   def cutoff
-    Period.check_off(self)
-    build_next_period
+    return unless can_cutoff
+    PeriodCutoffService.new(self).exec
   end
 
+  # 强行提前结束的时候调用 force_cutoff
+  def force_cutoff
+    self.update_attributes(cut_at: Time.now)
+    PeriodCutoffService.new(self).exec
+  end
+
+  # 这里也可以直接调用批量插入 bulk_insert 之类的
   def check_subscriptions
+    Subscription.without_order(self).each do |sub|
+      sub.orders.create(
+        period: self
+      )
+    end
   end
 
   def build_next_period
 
+    period = Period.create(
+      start_at: self.cut_at,
+      cut_at:   self.cut_at + Period.default_duration
+    )
+
+    CutoffWorker.perform_at(period, period.cut_at)
+
   end
 
   private
+
+  # 时间没有到的时候直接 Return 掉 （存在推迟 Cutoff 的场景)
+  def can_cutoff
+    return false if (Time.now <= self.cut_at )
+    true
+  end
 
 end
 

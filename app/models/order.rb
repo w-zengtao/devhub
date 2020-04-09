@@ -3,16 +3,9 @@
 #
 
 class Order < ApplicationRecord
+
   belongs_to :subscription
   belongs_to :period
 
-  before_create do
-    self.set_period
-  end
 
-  private
-
-  def set_period
-    self.period = Period.current
-  end
 end

@@ -11,11 +11,11 @@ module AsyncHelper
 
   class_methods do
     def async_helper(*methods)
-      methods.map do |method|
-        puts method
-      end
-
-      return nil
+      # methods.map do |method|
+      #   define_method
+      # end
+      #
+      # return nil
     end
   end
 end

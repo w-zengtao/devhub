@@ -6,18 +6,21 @@ class Subscription < ApplicationRecord
   has_many :orders
   has_many :items
 
-  scope :un_terminated, -> {}
+  scope :un_terminated, -> { where(terminated: false)}
+  scope :without_order, -> (period) {
+    where.not(id: Subscription.joins(:orders).where("orders.period_id = ?", period.id)) if period
+  }
 
   # ------------------- Callbacks -------------------
 
   after_create_commit do
-    self.build_order
+    build_order
   end
 
-  private
+  # private
 
   def build_order
-    self.orders.create()
+    self.orders.create(period: Period.current)
   end
 
   # ------------------- Callbacks End -------------------
@@ -27,7 +30,7 @@ class Subscription < ApplicationRecord
 
   # 用户可以终止订阅
   def terminate
-
+    self.update_attributes(terminated: true)
   end
 
 end
