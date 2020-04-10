@@ -32,6 +32,12 @@ class Period < ApplicationRecord
   end
 
   # ------------------- Class Methods End -------------------
+  #
+
+  def migrate(cur_at)
+    self.update_attributes(cut_at: cur_at)
+    PeriodCutoffService.new(self).exec
+  end
 
   # 0. 检查自身状态、确定能够执行 Cutoff 不需要迁移
   # 1. 检查所有 未终止 的订阅 并且 未创建订单的订阅
