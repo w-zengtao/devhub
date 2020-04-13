@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_154042) do
+ActiveRecord::Schema.define(version: 2020_04_13_141649) do
 
   create_table "items", force: :cascade do |t|
     t.string "name"
@@ -29,6 +29,14 @@ ActiveRecord::Schema.define(version: 2020_04_09_154042) do
   create_table "periods", force: :cascade do |t|
     t.datetime "start_at"
     t.datetime "cut_at"
+  end
+
+  create_table "statistics_item_clicks", force: :cascade do |t|
+    t.integer "item_id"
+    t.integer "clicked", default: 0
+    t.date "date"
+    t.index ["item_id", "date"], name: "idx_item_clicks_uniq", unique: true
+    t.index ["item_id"], name: "index_statistics_item_clicks_on_item_id"
   end
 
   create_table "subscriptions", force: :cascade do |t|
