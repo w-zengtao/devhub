@@ -17,9 +17,6 @@ jobs:
   test:
 
     runs-on: ubuntu-latest
-    services: 
-      sqlite:
-        image: sqlite3
 
     steps:
     - uses: actions/checkout@master
@@ -31,6 +28,8 @@ jobs:
       with:
         ruby-version: 2.6.5
     - name: Install dependencies
-      run: bundle install
+      run: |
+        sudo apt-get install libsqlite3-dev
+        bundle install
     - name: Run tests
       run: bundle exec rake
