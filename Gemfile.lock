@@ -1,5 +1,5 @@
 GEM
-  remote: https://gems.ruby-china.com/
+  remote: https://rubygems.org/
   specs:
     actioncable (6.0.2.2)
       actionpack (= 6.0.2.2)
@@ -92,7 +92,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     puma (4.3.3)
       nio4r (~> 2.0)
-    rack (2.2.2)
+    rack (2.2.6.2)
     rack-protection (2.0.8.1)
       rack
     rack-test (1.1.0)
